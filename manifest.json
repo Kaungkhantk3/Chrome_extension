@@ -1,29 +1,15 @@
 {
   "manifest_version": 3,
   "name": "AI Context Highlighter",
-  "version": "0.2.0",
-  "description": "Select text on any site to get instant AI context, definitions, and clean summaries. Save and copy in one click.",
-  "permissions": [
-    "storage",
-    "activeTab",
-    "scripting"
-  ],
+  "version": "0.2.5",
+  "description": "Instant on-page explanations and summaries for highlighted text.",
+  "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": [
-    "https://ai-context-highlighter.luke-dev.workers.dev/*",
     "https://en.wikipedia.org/*",
-    "https://api.dictionaryapi.dev/*"
+    "https://api.dictionaryapi.dev/*",
+    "https://ai-context-highlighter.<your-subdomain>.workers.dev/*"
   ],
-  "background": {
-    "service_worker": "background.js"
-  },
-  "action": {
-    "default_popup": "popup.html",
-    "default_title": "Enable on this tab"
-  },
-  "icons": {
-    "16": "icons/icon16.png",
-    "32": "icons/icon32.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
-  }
+  "action": { "default_title": "Enable on this tab" },
+  "background": { "service_worker": "background.js" },
+  "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
 }
