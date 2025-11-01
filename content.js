@@ -44,10 +44,46 @@ function ensureBubble() {
   bubble.addEventListener("click", (e) => {
     const action = e.target?.dataset?.action;
     if (!action) return;
-    showPanel(`Clicked: ${action} on "${currentSelection}"`);
+  
+    const fail = (msg) => {
+      console.error("[ACH] content: action failed:", action, msg);
+      showPanel(msg || "Something went wrong.");
+    };
+  
+    if (action === "copy") {
+      navigator.clipboard.writeText(currentSelection).then(
+        () => showPanel("Copied to clipboard."),
+        () => fail("Copy failed.")
+      );
+      return;
+    }
+  
+    if (action === "save") {
+      showPanel("Saving…");
+      chrome.runtime.sendMessage({ type: "save", text: currentSelection }, (resp) => {
+        const err = chrome.runtime.lastError;
+        if (err) return fail("Save error: " + err.message);
+        showPanel(resp?.ok ? "Saved to extension notes." : "Save failed.");
+      });
+      return;
+    }
+  
+    if (action === "explain" || action === "define" || action === "ai") {
+      showPanel(action === "ai" ? "Thinking with AI…" : "Loading…");
+      const payload = { type: action === "ai" ? "ai_explain" : action, text: currentSelection };
+      if (action === "ai") payload.context = document.title + " | " + location.hostname;
+  
+      chrome.runtime.sendMessage(payload, (resp) => {
+        const err = chrome.runtime.lastError;
+        if (err) return fail("Message error: " + err.message);
+        if (!resp) return fail("No response from background.");
+        const out = resp.result || "No result.";
+        showPanel(out);
+        console.log("[ACH] content: got response for", action, out);
+      });
+    }
   });
-  document.documentElement.appendChild(bubble);
-  return bubble;
+  
 }
 
 function ensurePanel() {

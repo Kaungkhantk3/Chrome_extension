@@ -57,17 +57,9 @@ async function fetchAISummary(selection, context) {
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   (async () => {
     try {
-      if (!msg || !msg.type) return sendResponse({ result: "Bad request." });
+      console.log("[ACH:bg] message:", msg);
 
-      if (msg.type === "explain") {
-        const result = await fetchWikipediaSummary(msg.text || "");
-        return sendResponse({ result: result || "No summary found." });
-      }
-
-      if (msg.type === "define") {
-        const result = await fetchDefinition(msg.text || "");
-        return sendResponse({ result: result || "No definition found." });
-      }
+      if (!msg?.type) return sendResponse({ result: "Bad request." });
 
       if (msg.type === "save") {
         const item = { text: msg.text || "", savedAt: Date.now() };
@@ -77,22 +69,58 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         return sendResponse({ ok: true });
       }
 
-      if (msg.type === "ai_explain") {
-        const res = await fetchAISummary(msg.text || "", msg.context || "");
-        return sendResponse({ result: res || "No AI summary found." });
+      if (msg.type === "explain") {
+        const r = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent((msg.text||"").trim())}`, {
+          headers: { accept: "application/json" }
+        });
+        let result = "No summary found.";
+        if (r.ok) {
+          const data = await r.json();
+          result = data.extract || data.description || result;
+        }
+        return sendResponse({ result });
       }
 
-      console.warn("[ACH:bg] Unknown msg.type", msg.type);
+      if (msg.type === "define") {
+        const r = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(msg.text||"")}`);
+        let result = "No definition found.";
+        if (r.ok) {
+          const data = await r.json();
+          const first = Array.isArray(data) ? data[0] : null;
+          result = first?.meanings?.[0]?.definitions?.[0]?.definition || result;
+        }
+        return sendResponse({ result });
+      }
+
+      if (msg.type === "ai_explain") {
+        const WORKER_URL = "https://ai-context-highlighter.luke-dev.workers.dev/"; // 
+        if (!WORKER_URL || WORKER_URL.includes("<your-worker>")) {
+          return sendResponse({ result: "AI is not configured yet (Worker URL missing)." });
+        }
+        const r = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ selection: msg.text || "", context: msg.context || "" })
+        });
+        if (!r.ok) {
+          const txt = await r.text();
+          console.error("[ACH:bg] AI error:", r.status, txt);
+          return sendResponse({ result: `AI request failed (HTTP ${r.status}).` });
+        }
+        const data = await r.json();
+        return sendResponse({ result: data.result || "No AI summary found." });
+      }
+
+      console.warn("[ACH:bg] Unknown type:", msg.type);
       sendResponse({ result: "Unknown action." });
     } catch (e) {
-      console.error("[ACH:bg] onMessage error:", e);
-      sendResponse({ result: `Error: ${String(e.message || e)}` });
+      console.error("[ACH:bg] Handler error:", e);
+      sendResponse({ result: "Error: " + (e?.message || String(e)) });
     }
   })();
-
-  // Keep port open for async
-  return true;
+  return true; // keep the message channel open for async
 });
+
 
 // ====== CLICK-TO-INJECT (only if you use activeTab flow) ======
 chrome.action?.onClicked.addListener(async (tab) => {
