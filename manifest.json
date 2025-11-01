@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AI Context Highlighter",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Instant on-page explanations and summaries for highlighted text.",
   "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": [
