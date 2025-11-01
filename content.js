@@ -71,7 +71,7 @@ function showPanel(text) {
 function setBubblePosition(rect) {
   const x = window.scrollX + rect.left + rect.width / 2;
   const y = window.scrollY + rect.top - 8;
-  bubble.style.left = `${x}px};
+  bubble.style.left = `${x}px`;
   bubble.style.top = `${y}px`;
   bubble.style.transform = "translate(-50%, -100%)";
   bubble.style.display = "flex";

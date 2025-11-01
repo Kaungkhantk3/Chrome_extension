@@ -43,6 +43,20 @@ async function fetchAISummary(q, context) {
   }
 }
 
+chrome.action.onClicked.addListener(async (tab) => {
+  if (!tab.id) return;
+  await chrome.scripting.executeScript({
+    target: { tabId: tab.id },
+    files: ["content.js"]
+  });
+  await chrome.scripting.insertCSS({
+    target: { tabId: tab.id },
+    files: ["content.css"]
+  });
+  
+});
+
+
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   (async () => {
     if (msg.type === "explain") {
