@@ -1,16 +1,37 @@
-# AI Context Highlighter (Chrome Extension)
+# 🧠 AI Context Highlighter — Chrome Extension
 
-Select text on any site to get **AI summaries**, **Wikipedia explanations**, **dictionary definitions**, and **one‑click save** to notes.
+**AI Context Highlighter** helps you instantly understand any text on the web.  
+Highlight a sentence or phrase, and get **AI-powered summaries**, **definitions**, or **Wikipedia explanations** — all without leaving the page.
 
-## Install (Unpacked)
-1. Download the ZIP from ChatGPT, extract it.
-2. Open Chrome → `chrome://extensions` → enable **Developer mode**.
-3. Click **Load unpacked** → select the folder.
-4. Select text on any page → a bubble appears → click **AI / Explain / Define / Copy / Save**.
+---
 
-## AI Backend
-Deploy the Cloudflare Worker in `/ai-context-worker/worker.js`, set your `OPENAI_API_KEY` secret, deploy, then replace `https://<YOUR_WORKER_URL>/` in `background.js` and `manifest.json`.
+## 🚀 Features
 
-## Privacy
-Notes are stored locally (`chrome.storage.local`). AI requests send only the selection text (and optional page title/host) to your Worker.
-# Chrome_extension
+- 🧠 **AI Summary** — concise explanations generated securely via a Cloudflare Worker + OpenAI API
+- 📚 **Explain / Define** — uses trusted public sources like Wikipedia and DictionaryAPI
+- 📋 **Copy / Save Notes** — store key highlights locally (no account needed)
+- ⚙️ **Clean UI** — lightweight bubble overlay and popup for saved notes
+- 🔒 **Privacy First** — no tracking, analytics, or personal data collection
+
+---
+
+## 🧩 How It Works
+
+1. Highlight text on any webpage.
+2. A small action bubble appears with options: **AI**, **Explain**, **Define**, **Copy**, or **Save**.
+3. Click one to view instant results in a floating panel.
+4. Saved notes appear in the extension’s popup panel.
+
+---
+
+## 🧰 Tech Stack
+
+- **Languages:** HTML, CSS, JavaScript
+- **Backend:** Cloudflare Worker (serverless proxy for OpenAI API)
+- **APIs:**
+  - Wikipedia REST API
+  - DictionaryAPI.dev
+  - OpenAI (via Worker)
+- **Chrome APIs:** `activeTab`, `scripting`, `storage`, `host_permissions`
+
+---
