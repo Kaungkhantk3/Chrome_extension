@@ -7,7 +7,7 @@
   "host_permissions": [
     "https://en.wikipedia.org/*",
     "https://api.dictionaryapi.dev/*",
-    "https://https://ai-context-highlighter.luke-dev.workers.dev/*"
+    "https://ai-context-highlighter.luke-dev.workers.dev/*"
   ],
   "action": { "default_title": "Enable on this tab" },
   "background": { "service_worker": "background.js" },
